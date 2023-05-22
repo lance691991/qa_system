@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
-    <file url="file://$PROJECT_DIR$/corpus/json_format_files/09.jsonl" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/corpus/json_format_files/09.jsonl" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/corpus/txt_files/08数字档案馆人员岗位设置和职责（完成）.txt" charset="GBK" />
     <file url="file://$PROJECT_DIR$/corpus/txt_files/09数字档案馆系统运行维护管理制度（完成）.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/corpus/txt_files/YLJ-IM-26声像档案管理实施细则.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/corpus/txt_files/电子文件通用元数据规范.txt" charset="GBK" />
   </component>
 </project>
