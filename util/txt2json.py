@@ -10,7 +10,9 @@ for file_name in list_dir:
             lines = rf.readlines()
             with open("./corpus/json_files/" + file_name[0: -4] + ".jsonl", "a") as wf:
                 for l in lines:
-                    l = l.replace("\n", "")
+                    l = l.replace("\t", "").replace(" ", "").replace("\n", "")
+                    if not l:
+                        continue
                     l_json = {"id": f"doc{doc_index}",
                               "contents": l}
                     json.dump(l_json, wf)
