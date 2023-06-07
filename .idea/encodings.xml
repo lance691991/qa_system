@@ -2,6 +2,9 @@
 <project version="4">
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/corpus/json_format_files/09.jsonl" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/corpus/mrc_qas/cmrc2018_dev.jsonl" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/corpus/mrc_qas/cmrc2018_train.jsonl" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/corpus/mrc_qas/cmrc2018_trial.jsonl" charset="GBK" />
     <file url="file://$PROJECT_DIR$/corpus/txt_files/02业务系统归档接口方案，包含技术描述（V2.2）.txt" charset="GBK" />
     <file url="file://$PROJECT_DIR$/corpus/txt_files/05档案数字化技术规范（完成）.txt" charset="GBK" />
     <file url="file://$PROJECT_DIR$/corpus/txt_files/06电子文件封装技术规范.txt" charset="GBK" />

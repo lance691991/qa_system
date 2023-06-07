@@ -9,34 +9,30 @@ class QAEnd2End:
     def __init__(self, dense_searcher, sparse_searcher, qa_pipeline):
         self.dense_searcher = dense_searcher
         self.sparse_searcher = sparse_searcher
-        self.assemble_hybrid_searcher(dense_searcher, sparse_searcher)
+        self.hybrid_searcher = self.assemble_hybrid_searcher(dense_searcher, sparse_searcher)
         self.qa_pipline = qa_pipeline
+        self.mrc_dense_index_json = None
 
-    def assemble_hybrid_searcher(self, d_searcher, s_searcher):
-        self.hybrid_searcher = HybridSearcher(d_searcher, s_searcher)
+    @staticmethod
+    def assemble_hybrid_searcher(d_searcher, s_searcher):
+        return HybridSearcher(d_searcher, s_searcher)
 
-    def hybrid_search(self, query, k=3, num_sentence=5):
+    def set_json_faiss_index(self, path):
+        self.mrc_dense_index_json = json.load(open(path))
+
+    def hybrid_search(self, query, k=1):
         hits = self.hybrid_searcher.search(query, k=k)
         result_list = []
         for i in range(k):
-            result = ""
             doc_id = hits[i].docid
-            doc_id_num = int(doc_id[3:])
-            for j in range(-num_sentence, num_sentence + 1):
-                content = json.loads(self.sparse_searcher.doc("doc" + str(doc_id_num + j)).raw()).get("contents")
-                print(content)
-                if not content:
-                    continue
-                else:
-                    if not content.endswith("。"):
-                        content += "。"
-                    result += content
-            result_list.append(result)
-            print("\n")
+            faiss_content = self.mrc_dense_index_json.get(doc_id)
+            raw_doc = self.sparse_searcher.search(faiss_content, k=1)[0].raw
+            content = json.loads(raw_doc).get("contents")
+            result_list.append(content)
         return result_list
 
-    def qa(self, query):
-        hybrid_search_result = self.hybrid_search(query=query)
+    def qa(self, query, k=3):
+        hybrid_search_result = self.hybrid_search(query=query, k=k)
         qa_result = []
         for r in hybrid_search_result:
             qa_input = {
@@ -44,19 +40,24 @@ class QAEnd2End:
                 "context": r
             }
             qa_result.append(self.qa_pipline(qa_input))
-        return qa_result
+        return hybrid_search_result, qa_result
 
 
 if __name__ == '__main__':
-    s_searcher = LuceneSearcher('indexes/sparse_index')
+
+    s_searcher = LuceneSearcher('./indexes/mrc_sparse_index')
     s_searcher.set_language('zh')
     encoder = AutoQueryEncoder('./models/shibing')
     d_searcher = FaissSearcher(
-        './indexes/shibing_index',
+        './indexes/mrc_index',
         encoder
     )
     model = AutoModelForQuestionAnswering.from_pretrained('./models/reader/luhua_mrc')
     tokenizer = AutoTokenizer.from_pretrained('./models/reader/luhua_mrc')
     QA = pipeline('question-answering', model=model, tokenizer=tokenizer)
     qa_end2end = QAEnd2End(d_searcher, s_searcher, QA)
-    print(qa_end2end.qa(query="网页归档需收集的内容"))
+    qa_end2end.set_json_faiss_index("./corpus/mrc_index/mrc_index.json")
+
+    hybrid_search_result, qa_result = qa_end2end.qa(query="《战国无双3》是由哪两个公司合作开发的？")
+    print(hybrid_search_result)
+    print(qa_result)
