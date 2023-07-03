@@ -2,3 +2,4 @@ fastapi_template
 models
 indexes
 embeddings
+checkpoint-*

@@ -18,19 +18,23 @@ list_dir = os.listdir(dir_path)
 #                     wf.write('\n')
 #             rf.close()
 
-for file_name in list_dir:
-    if file_name.endswith(".json"):
-        with open("corpus/mrc/" + file_name, "r") as rf:
-            mrc_list = json.load(rf)
-            # print(mrc_list[0].keys())
-            with open("corpus/mrc_qas/" + file_name[0: -5] + ".jsonl", "a") as wf:
-                for d in mrc_list:
-                    qas_list = d.get("qas")
-                    for qa in qas_list:
-                        try:
-                            json.dump(qa, wf, ensure_ascii=False)
-                            wf.write("\n")
-                        except Exception as e:
-                            print(e)
-                wf.close()
-            rf.close()
+# for file_name in list_dir:
+#     if file_name.endswith(".json"):
+#         with open("corpus/mrc/" + file_name, "r") as rf:
+#             mrc_list = json.load(rf)
+#             # print(mrc_list[0].keys())
+#
+#             with open("corpus/mrc_qas/" + file_name[0: -5] + ".jsonl", "a") as wf:
+#                 for d in mrc_list:
+#                     qas_list = d.get("qas")
+#                     for qa in qas_list:
+#                         try:
+#                             json.dump(qa, wf, ensure_ascii=False)
+#                             wf.write("\n")
+#                         except Exception as e:
+#                             print(e)
+#                 wf.close()
+#             rf.close()
+with open("corpus/mrc/cmrc2018_train.json", "r") as rf:
+    mrc_list = json.load(rf)
+    print(mrc_list[0])
