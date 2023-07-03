@@ -57,13 +57,18 @@ class QAEnd2End:
         result_list = []
         hits = self.sparse_searcher.search(query, k=k)
         for i in range(len(hits)):
-            raw_doc = hits[i].raw
-            print(raw_doc)
-            content = json.loads(raw_doc).get("contents")
-            result_list.append(content)
+            result = ""
+            doc_id = hits[i].docid
+            doc_id_num = int(doc_id[3:])
+            for j in range(-3, 4):
+                content = json.loads(self.sparse_searcher.doc("doc" + str(doc_id_num + j)).raw()).get("contents")
+                if not content.endswith("。"):
+                    content += "。"
+                result += content
+            result_list.append(result)
         return result_list
         # hits = self.hybrid_searcher.search(query, k=k)
-        # for i in range(k):
+        # for i in range(len(hits)):
         #     result = ""
         #     doc_id = hits[i].docid
         #     doc_id_num = int(doc_id[3:])
