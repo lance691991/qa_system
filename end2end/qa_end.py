@@ -13,6 +13,7 @@ class QAEnd2End:
         self.qa_pipline = qa_pipeline
         self.mrc_dense_index_json = None
         self.trainer = None
+        self.index_adder = None
 
     def set_trainer(self, trainer):
         self.trainer = trainer
@@ -25,6 +26,18 @@ class QAEnd2End:
     def reassemble_pipline(self, model):
         self.qa_pipline = pipeline('question-answering', model=model)
 
+    def set_index_adder(self, index_adder):
+        self.index_adder = index_adder
+
+    def add_index(self, doc_input):
+        self.index_adder.add_doc(doc_input)
+        self.set_sparse_searcher('../indexes/sparse_index')
+
+    def set_sparse_searcher(self, path_dir):
+        self.sparse_searcher = LuceneSearcher(path_dir)
+        self.sparse_searcher.set_language("zh")
+        self.hybrid_searcher = self.assemble_hybrid_searcher(self.dense_searcher, self.sparse_searcher)
+
     @staticmethod
     def assemble_hybrid_searcher(d_searcher, s_searcher):
         return HybridSearcher(d_searcher, s_searcher)
@@ -32,7 +45,7 @@ class QAEnd2End:
     def set_json_faiss_index(self, path):
         self.mrc_dense_index_json = json.load(open(path))
 
-    def hybrid_search(self, query, k=1):
+    def hybrid_search(self, query, k=3):
         # hits = self.hybrid_searcher.search(query, k=k)
         # result_list = []
         # for i in range(k):
@@ -42,25 +55,25 @@ class QAEnd2End:
         #     content = json.loads(raw_doc).get("contents")
         #     result_list.append(content)
         result_list = []
-        # hits = self.sparse_searcher.search(query, k=k)
-        # print(hits)
-        # for i in range(k):
-        #     raw_doc = hits[i].raw
-        #     content = json.loads(raw_doc).get("contents")
-        #     result_list.append(content)
-        # return result_list
-        hits = self.hybrid_searcher.search(query, k=k)
-        for i in range(k):
-            result = ""
-            doc_id = hits[i].docid
-            doc_id_num = int(doc_id[3:])
-            for j in range(-3, 4):
-                content = json.loads(self.sparse_searcher.doc("doc" + str(doc_id_num + j)).raw()).get("contents")
-                if not content.endswith("。"):
-                    content += "。"
-                result += content
-            result_list.append(result)
+        hits = self.sparse_searcher.search(query, k=k)
+        for i in range(len(hits)):
+            raw_doc = hits[i].raw
+            print(raw_doc)
+            content = json.loads(raw_doc).get("contents")
+            result_list.append(content)
         return result_list
+        # hits = self.hybrid_searcher.search(query, k=k)
+        # for i in range(k):
+        #     result = ""
+        #     doc_id = hits[i].docid
+        #     doc_id_num = int(doc_id[3:])
+        #     for j in range(-3, 4):
+        #         content = json.loads(self.sparse_searcher.doc("doc" + str(doc_id_num + j)).raw()).get("contents")
+        #         if not content.endswith("。"):
+        #             content += "。"
+        #         result += content
+        #     result_list.append(result)
+        # return result_list
 
     def qa(self, query, k=3):
         hybrid_search_result = self.hybrid_search(query=query, k=k)

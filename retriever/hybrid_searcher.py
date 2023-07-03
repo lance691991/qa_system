@@ -4,15 +4,15 @@ from pyserini.search.faiss import FaissSearcher, AutoQueryEncoder
 import json
 
 mrc_dense_index_json = json.load(open("corpus/mrc_index/mrc_index.json"))
-s_searcher = LuceneSearcher('indexes/mrc_sparse_index')
+s_searcher = LuceneSearcher('indexes/sparse_index')
 s_searcher.set_language('zh')
 encoder = AutoQueryEncoder('./models/shibing')
 d_searcher = FaissSearcher(
-    './indexes/mrc_index',
+    './indexes/shibing_index',
     encoder
 )
 h_searcher = HybridSearcher(d_searcher, s_searcher)
-hits = h_searcher.search("粤剧打拍子的主要乐器", k=3)
+hits = h_searcher.search("这是一首简单", k=3)
 for i in range(0, 3):
     print(f'{i+1:2} {hits[i].docid:7} {hits[i].score:.5f}')
     doc_id = hits[i].docid

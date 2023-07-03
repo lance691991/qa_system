@@ -3,15 +3,15 @@ from pyserini.search.lucene import LuceneSearcher
 import json
 
 mrc_dense_index_json = json.load(open("corpus/mrc_index/mrc_index.json"))
-s_searcher = LuceneSearcher('indexes/mrc_sparse_index')
+s_searcher = LuceneSearcher('indexes/sparse_index')
 s_searcher.set_language('zh')
 encoder = AutoQueryEncoder('./models/shibing')
 searcher = FaissSearcher(
-    './indexes/mrc_index',
+    './indexes/shibing_index',
     encoder
 )
 
-hits = searcher.search("粤剧打拍子的主要乐器", k=3)
+hits = searcher.search("这是一首简单", k=3)
 
 # for i in range(0, 3):
 #     print(f'{i+1:2} {hits[i].docid:7} {hits[i].score:.5f}')
